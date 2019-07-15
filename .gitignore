@@ -1,0 +1,26 @@
+### Go ###
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+*.test
+
+/vendor/
+/Godeps/
+
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.history
+
+.DS_Store
+
+bin/
+
+elm-stuff
+node_modules
