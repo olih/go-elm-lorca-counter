@@ -4884,7 +4884,7 @@ var author$project$Main$view = function (model) {
 				elm$html$Html$button,
 				_List_fromArray(
 					[
-						elm$html$Html$Attributes$class('button'),
+						elm$html$Html$Attributes$class('button is-danger'),
 						elm$html$Html$Events$onClick(author$project$Main$Decrement)
 					]),
 				_List_fromArray(
@@ -4903,7 +4903,7 @@ var author$project$Main$view = function (model) {
 				elm$html$Html$button,
 				_List_fromArray(
 					[
-						elm$html$Html$Attributes$class('button is-danger'),
+						elm$html$Html$Attributes$class('button is-info'),
 						elm$html$Html$Events$onClick(author$project$Main$Increment)
 					]),
 				_List_fromArray(

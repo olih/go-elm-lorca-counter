@@ -37,9 +37,9 @@ update msg model =
 view : Model -> Html AppMsg
 view model =
   div []
-    [ button [ Attr.class "button", onClick Decrement ] [ text "-" ]
+    [ button [ Attr.class "button is-danger", onClick Decrement ] [ text "-" ]
     , div [] [ text (String.fromInt model.counter) ]
-    , button [ Attr.class "button is-danger", onClick Increment ] [ text "+" ]
+    , button [ Attr.class "button is-info", onClick Increment ] [ text "+" ]
     ]
 
 subscriptions : Model -> Sub AppMsg
