@@ -18,8 +18,11 @@
       const counted = await counterValue();
       app.ports.activeCounter.send(counted);
     });
-    
 
+    const updateUI = async () => {
+      const counted = await counterValue();
+      app.ports.activeCounter.send(counted);
+    }
   </script>
 </body>
 </html>

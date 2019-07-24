@@ -33,6 +33,12 @@ func (c *counter) Value() int {
 	return c.count
 }
 
+func updateUI(ui lorca.UI) lorca.Value {
+	return ui.Eval(`
+	await updateUI();
+	`)
+}
+
 func main() {
 	args := []string{}
 	if runtime.GOOS == "linux" {
