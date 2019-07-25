@@ -13,7 +13,7 @@ This code base demonstrates how to use Lorca, Go and Elm to create a desktop app
 * Embed all assets into a single binary.
 * Examples of unit tests for both Go and Elm
 
-![](counting.gif)
+![](counting-diagram.gif)
 
 ## Limitations
 
