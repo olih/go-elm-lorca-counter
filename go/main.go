@@ -8,35 +8,23 @@ import (
 	"os"
 	"os/signal"
 	"runtime"
-	"sync"
 
 	"github.com/zserge/lorca"
 )
 
 // Go types that are bound to the UI must be thread-safe, because each binding
-// is executed in its own goroutine. In this simple case we may use atomic
-// operations, but for more complex cases one should use proper synchronization.
-type counter struct {
-	sync.Mutex
-	count int
+// is executed in its own goroutine.
+
+//  message for increment counter
+type counterAddOp struct {
+	val  int // increment value +1 or -1
+	resp chan bool
 }
 
-func (c *counter) Add(n int) {
-	c.Lock()
-	defer c.Unlock()
-	c.count = c.count + n
-}
-
-func (c *counter) Value() int {
-	c.Lock()
-	defer c.Unlock()
-	return c.count
-}
-
-func updateUI(ui lorca.UI) lorca.Value {
-	return ui.Eval(`
-	await updateUI();
-	`)
+// message for refreshing UI with latest counter
+type refreshCounterOp struct {
+	counter int
+	resp    chan bool
 }
 
 func main() {
@@ -55,10 +43,51 @@ func main() {
 		log.Println("UI is ready")
 	})
 
+	// Creates two channels, one for sending increment, and another to refreshUI with latest counter
+	counterAddChannel := make(chan counterAddOp)
+	refreshCounterChannel := make(chan refreshCounterOp)
+
+	// counter goroutine
+	go func() {
+		var count = 0
+		for {
+			select {
+			case inc := <-counterAddChannel:
+				count = count + inc.val
+				ui.Eval(fmt.Sprintf("console.log('Go: inside goroutine for counter',%d)", count))
+				op := refreshCounterOp{
+					counter: count,
+					resp:    make(chan bool)}
+				refreshCounterChannel <- op
+				<-op.resp
+				inc.resp <- true
+			}
+		}
+	}()
+
+	// refresh UI with lastest goroutine
+	go func() {
+		for {
+			select {
+			case refresh := <-refreshCounterChannel:
+				ui.Eval(fmt.Sprintf("console.log('Go: inside goroutine for refresh',%d)", refresh.counter))
+				jsAction := fmt.Sprintf("updateUI(%d);", refresh.counter)
+				ui.Eval(jsAction)
+				refresh.resp <- true
+			}
+		}
+	}()
+
 	// Create and bind Go object to the UI
-	c := &counter{}
-	ui.Bind("counterAdd", c.Add)
-	ui.Bind("counterValue", c.Value)
+	ui.Bind("counterAdd", func(inc int) bool {
+		op := counterAddOp{
+			val:  inc,
+			resp: make(chan bool)}
+		counterAddChannel <- op
+		<-op.resp
+		ui.Eval(`console.log("Go: sent counterAdd message");`)
+		return true
+	})
 
 	// Load HTML.
 	// You may also use `data:text/html,<base64>` approach to load initial HTML,
@@ -71,13 +100,6 @@ func main() {
 	defer ln.Close()
 	go http.Serve(ln, http.FileServer(FS))
 	ui.Load(fmt.Sprintf("http://%s", ln.Addr()))
-
-	// You may use console.log to debug your JS code, it will be printed via
-	// log.Println(). Also exceptions are printed in a similar manner.
-	ui.Eval(`
-		console.log("Hello, world!");
-		console.log('Multiple values:', [1, false, {"x":5}]);
-	`)
 
 	// Wait until the interrupt signal arrives or browser window is closed
 	sigc := make(chan os.Signal)

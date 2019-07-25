@@ -14,13 +14,12 @@
 
       });
     app.ports.sendIncMessage.subscribe(async (inc) => {
+      console.log('counterAdd=', inc);
       await counterAdd(inc);
-      const counted = await counterValue();
-      app.ports.activeCounter.send(counted);
     });
 
-    const updateUI = async () => {
-      const counted = await counterValue();
+    const updateUI = (counted) => {
+      console.log('JS: inside updateUI', counted);
       app.ports.activeCounter.send(counted);
     }
   </script>
