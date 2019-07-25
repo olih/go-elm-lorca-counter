@@ -53,7 +53,7 @@ func main() {
 		for {
 			select {
 			case inc := <-counterAddChannel:
-				count = count + inc.val
+				count = Increment(count, inc.val)
 				ui.Eval(fmt.Sprintf("console.log('Go: inside goroutine for counter',%d)", count))
 				op := refreshCounterOp{
 					counter: count,

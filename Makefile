@@ -31,6 +31,7 @@ beautify:
 	cd elm; elm-format src/ --yes
 
 test:
+	cd go; go test
 	cd elm; elm-test
 
 # Download Elm and Go dependencies
