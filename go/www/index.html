@@ -1,0 +1,27 @@
+<html>
+<head>
+    <link rel="stylesheet" href="bulma.min.css" />
+    <script src="main.js"></script>
+    <title>Counter</title>
+</head>
+<body>
+  <main></main>
+  <script>
+    var activeCounter;
+    var app = Elm.Main.init({
+       node: document.querySelector('main'),
+       flags: activeCounter
+
+      });
+    app.ports.sendIncMessage.subscribe(async (inc) => {
+      console.log('counterAdd=', inc);
+      await counterAdd(inc);
+    });
+
+    const updateUI = (counted) => {
+      console.log('JS: inside updateUI', counted);
+      app.ports.activeCounter.send(counted);
+    }
+  </script>
+</body>
+</html>
